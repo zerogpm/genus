@@ -7,6 +7,7 @@ imports:
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: en
+    cache_type: file_system
 
 framework:
     #esi: ~
@@ -39,7 +40,7 @@ twig:
     debug: '%kernel.debug%'
     strict_variables: '%kernel.debug%'
     number_format:
-      thousands_separator: '.'
+      thousands_separator: ','
 
 # Doctrine Configuration
 doctrine:
@@ -70,3 +71,10 @@ swiftmailer:
     username: '%mailer_user%'
     password: '%mailer_password%'
     spool: { type: memory }
+
+doctrine_cache:
+    providers:
+      my_markdown_cache:
+        type: %cache_type%
+        file_system:
+          directory: /tmp/doctrine_cache

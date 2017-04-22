@@ -7,7 +7,7 @@ var NoteSection = React.createClass({
 
     componentDidMount: function() {
         this.loadNotesFromServer();
-        setInterval(this.loadNotesFromServer, 2000);
+        //setInterval(this.loadNotesFromServer, 2000);
     },
 
     loadNotesFromServer: function() {
