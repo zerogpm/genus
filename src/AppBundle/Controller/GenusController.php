@@ -23,12 +23,12 @@ class GenusController extends Controller
      */
     public function showAction($name)
     {
-        $notes = [
-            'Octpus asked me a riddle',
-            'I counted 8 legs',
-            'Inked!'
-        ];
-        return $this->render('genus/show.html.twig', compact('name', 'notes'));
+        $funFact = 'Octopuses can change the color of their body in just *three-tenths* of a second!';
+
+        $funFact = $this->get('markdown.parser')
+            ->transform($funFact);
+
+        return $this->render('genus/show.html.twig', compact('name', 'funFact'));
     }
 
     /**
