@@ -49,14 +49,16 @@ class GenusController extends Controller
     }
 
     /**
-     * @Route("/genus/{name}")
+     * @Route("/genus/{name}", name="genus_show")
      * @Method("GET")
      */
     public function showAction($name)
     {
-        $funFact = 'Octopuses can change the color of their body in just *three-tenths* of a second!';
+        $em = $this->getDoctrine()->getManager();
+        $genus = $em->getRepository('AppBundle:Genus')
+            ->findOneBy(['name' => $name]);
 
-        $cache = $this->get('doctrine_cache.providers.my_markdown_cache');
+        /*$cache = $this->get('doctrine_cache.providers.my_markdown_cache');
         $key = md5($funFact);
         if ($cache->contains($key)) {
             $funFact = $cache->fetch($key);
@@ -65,9 +67,16 @@ class GenusController extends Controller
             $funFact = $this->get('markdown.parser')
                 ->transform($funFact);
             $cache->save($key, $funFact);
+        }*/
+
+        $this->get('logger')
+            ->info('Showing genus: '.$name);
+
+        if (!$genus) {
+            throw  $this->createNotFoundException('No genus found');
         }
 
-        return $this->render('genus/show.html.twig', compact('name', 'funFact'));
+        return $this->render('genus/show.html.twig', compact('name', 'genus'));
     }
 
     /**
