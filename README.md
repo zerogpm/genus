@@ -1,4 +1,10 @@
-symfony3
+symfony
 ========
 
-A Symfony project created on April 22, 2017, 4:28 am.
+Genus Project
+
+cd symfony3
+cd bin
+run php console server:run<br/>
+<br/>
+Go to localhost:8000

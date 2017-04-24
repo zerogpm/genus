@@ -70,7 +70,7 @@ class GenusNote
      */
     public function getUserAvatarFilename()
     {
-        return $this->userAvatarFilename;
+        return '/images/'.$this->userAvatarFilename;
     }
 
     /**
