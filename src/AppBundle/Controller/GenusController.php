@@ -54,7 +54,7 @@ class GenusController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $genuses = $em->getRepository('AppBundle:Genus')
-            ->findAllPublishedOrderedBySize();
+            ->findAllPublishedOrderedByRecentlyActive();
         return $this->render('genus/list.html.twig', compact('genuses'));
     }
 
@@ -82,11 +82,16 @@ class GenusController extends Controller
         $this->get('logger')
             ->info('Showing genus: '.$name);
 
+        $recentNote = $em->getRepository('AppBundle:GenusNote')
+            ->findAllRecentNotesForGenus($genus);
+
+        $recentNoteCount = count($recentNote);
+
         if (!$genus) {
             throw  $this->createNotFoundException('No genus found');
         }
 
-        return $this->render('genus/show.html.twig', compact('name', 'genus'));
+        return $this->render('genus/show.html.twig', compact('name', 'genus', 'recentNoteCount'));
     }
 
     /**
