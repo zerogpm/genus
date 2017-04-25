@@ -91,7 +91,10 @@ class GenusController extends Controller
             throw  $this->createNotFoundException('No genus found');
         }
 
-        return $this->render('genus/show.html.twig', compact('name', 'genus', 'recentNoteCount'));
+        $transformer = $this->get('app.markdown_transformer');
+        $funFact = $transformer->parse($genus->getFunFact());
+
+        return $this->render('genus/show.html.twig', compact('name', 'genus', 'recentNoteCount', 'funFact'));
     }
 
     /**
