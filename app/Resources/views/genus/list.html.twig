@@ -4,23 +4,23 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Geuns</th>
+                <th>Genus</th>
                 <th># of species</th>
                 <th>Last updated</th>
             </tr>
         </thead>
-            <tbody>
-                {% for genus in genuses %}
-                    <tr>
-                        <td>
-                            <a href="{{ path('genus_show', {'name': genus.name}) }}">
-                                {{ genus.name }}
-                            </a>
-                        </td>
-                        <td>{{ genus.speciesCount }}</td>
-                        <td>{{ genus.updatedAt|date('Y-m-d') }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
+        <tbody>
+            {% for genus in genuses %}
+                <tr>
+                    <td>
+                        <a href="{{ path('genus_show', {'genusName': genus.name}) }}">
+                            {{ genus.name }}
+                        </a>
+                    </td>
+                    <td>{{ genus.speciesCount }}</td>
+                    <td>{{ genus.updatedAt|date('Y-m-d') }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
     </table>
 {% endblock %}

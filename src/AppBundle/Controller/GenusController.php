@@ -1,22 +1,15 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: jiansu
- * Date: 4/21/17
- * Time: 7:36 PM
- */
 
 namespace AppBundle\Controller;
 
-
 use AppBundle\Entity\Genus;
 use AppBundle\Entity\GenusNote;
+use AppBundle\Service\MarkdownTransformer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-
 
 class GenusController extends Controller
 {
@@ -26,15 +19,14 @@ class GenusController extends Controller
     public function newAction()
     {
         $genus = new Genus();
-        $genus->setName('Octopus'.rand(1,100));
+        $genus->setName('Octopus'.rand(1, 100));
         $genus->setSubFamily('Octopodinae');
-        $genus->setSpeciesCount(rand(100,9999));
-        $genus->setFunFact('who is your name'.rand(1,100));
+        $genus->setSpeciesCount(rand(100, 99999));
 
         $genusNote = new GenusNote();
-        $genusNote->setUsername('Chris');
+        $genusNote->setUsername('AquaWeaver');
         $genusNote->setUserAvatarFilename('ryan.jpeg');
-        $genusNote->setNote('I could use some help');
+        $genusNote->setNote('I counted 8 legs... as they wrapped around me');
         $genusNote->setCreatedAt(new \DateTime('-1 month'));
         $genusNote->setGenus($genus);
 
@@ -43,58 +35,52 @@ class GenusController extends Controller
         $em->persist($genusNote);
         $em->flush();
 
-        return new Response('<html><body>genus created!</body></html>');
+        return new Response('<html><body>Genus created!</body></html>');
     }
 
     /**
      * @Route("/genus")
-     * @Method("GET")
      */
     public function listAction()
     {
         $em = $this->getDoctrine()->getManager();
+
         $genuses = $em->getRepository('AppBundle:Genus')
             ->findAllPublishedOrderedByRecentlyActive();
-        return $this->render('genus/list.html.twig', compact('genuses'));
+
+        return $this->render('genus/list.html.twig', [
+            'genuses' => $genuses
+        ]);
     }
 
     /**
-     * @Route("/genus/{name}", name="genus_show")
-     * @Method("GET")
+     * @Route("/genus/{genusName}", name="genus_show")
      */
-    public function showAction($name)
+    public function showAction($genusName)
     {
         $em = $this->getDoctrine()->getManager();
+
         $genus = $em->getRepository('AppBundle:Genus')
-            ->findOneBy(['name' => $name]);
-
-        /*$cache = $this->get('doctrine_cache.providers.my_markdown_cache');
-        $key = md5($funFact);
-        if ($cache->contains($key)) {
-            $funFact = $cache->fetch($key);
-        } else {
-            sleep(1);
-            $funFact = $this->get('markdown.parser')
-                ->transform($funFact);
-            $cache->save($key, $funFact);
-        }*/
-
-        $this->get('logger')
-            ->info('Showing genus: '.$name);
-
-        $recentNote = $em->getRepository('AppBundle:GenusNote')
-            ->findAllRecentNotesForGenus($genus);
-
-        $recentNoteCount = count($recentNote);
+            ->findOneBy(['name' => $genusName]);
 
         if (!$genus) {
-            throw  $this->createNotFoundException('No genus found');
+            throw $this->createNotFoundException('genus not found');
         }
 
-        $transformer = $this->get('app.markdown_transformer');
-        $funFact = $transformer->parse($genus->getFunFact());
+        $markdownTransformer = $this->get('app.markdown_transformer');
+        $funFact = $markdownTransformer->parse($genus->getFunFact());
 
-        return $this->render('genus/show.html.twig', compact('name', 'genus', 'recentNoteCount', 'funFact'));
+        $this->get('logger')
+            ->info('Showing genus: '.$genusName);
+
+        $recentNotes = $em->getRepository('AppBundle:GenusNote')
+            ->findAllRecentNotesForGenus($genus);
+
+        return $this->render('genus/show.html.twig', array(
+            'genus' => $genus,
+            'funFact' => $funFact,
+            'recentNoteCount' => count($recentNotes)
+        ));
     }
 
     /**
@@ -104,11 +90,12 @@ class GenusController extends Controller
     public function getNotesAction(Genus $genus)
     {
         $notes = [];
+
         foreach ($genus->getNotes() as $note) {
             $notes[] = [
                 'id' => $note->getId(),
                 'username' => $note->getUsername(),
-                'avatarUri' => $note->getUserAvatarFilename(),
+                'avatarUri' => '/images/'.$note->getUserAvatarFilename(),
                 'note' => $note->getNote(),
                 'date' => $note->getCreatedAt()->format('M d, Y')
             ];
@@ -120,5 +107,4 @@ class GenusController extends Controller
 
         return new JsonResponse($data);
     }
-
 }
