@@ -130,4 +130,13 @@ class Genus
     {
         $this->firstDiscoveredAt = $firstDiscoveredAt;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getIsPublished()
+    {
+        return $this->isPublished;
+    }
+
 }
